@@ -1,0 +1,34 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+
+# Env files
+.env
+
+# VS Code settings
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+# MySQL temporary files
+*.sql~
+
+# Optional: JetBrains IDEs
+.idea/
