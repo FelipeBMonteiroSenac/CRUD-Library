@@ -2,8 +2,6 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-
 def connect_to_database():
     try:
         connection = mysql.connector.connect(

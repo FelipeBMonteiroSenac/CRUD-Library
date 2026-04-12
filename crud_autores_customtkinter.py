@@ -2,7 +2,17 @@ import customtkinter as ctk
 from tkinter import ttk, messagebox
 from datetime import datetime
 from connect import connect_to_database
-from style import COLORS, FONT_TITLE, FONT_LABEL, FONT_INPUT, card, primary_button, danger_button, success_button
+from style import (
+    COLORS,
+    FONT_TITLE,
+    FONT_LABEL,
+    card,
+    primary_button,
+    danger_button,
+    success_button,
+    secondary_button,
+    input_field
+)
 
 
 class AppAutores:
@@ -26,22 +36,47 @@ class AppAutores:
     def build_ui(self):
         # ===== CONTAINER =====
         container = ctk.CTkFrame(self.root, fg_color="transparent")
-        container.pack(fill="both", expand=True, padx=20, pady=20)
+        container.pack(fill="both", expand=True, padx=30, pady=30)
 
         # ===== LEFT (LISTA) =====
         left = card(container)
-        left.pack(side="left", fill="both", expand=True, padx=(0, 10))
+        left.pack(side="left", fill="both", expand=True, padx=(0, 15))
 
-        ctk.CTkLabel(left, text="Autores", font=FONT_TITLE, text_color=COLORS["text"]).pack(pady=15)
+        ctk.CTkLabel(
+            left,
+            text="Autores",
+            font=("SF Pro Display", 22, "bold"),
+            text_color=COLORS["text"]
+        ).pack(pady=20)
 
-        # Treeview (mantido)
+        # ===== TREEVIEW STYLE =====
+        style = ttk.Style()
+        style.theme_use("default")
+
+        style.configure(
+            "Treeview",
+            background="#ffffff",
+            foreground="#1c1c1e",
+            rowheight=28,
+            fieldbackground="#ffffff",
+            bordercolor=COLORS["border"],
+            borderwidth=1
+        )
+
+        style.map(
+            "Treeview",
+            background=[("selected", COLORS["primary"])],
+            foreground=[("selected", "#ffffff")]
+        )
+
         columns = ("ID", "Nome", "Nascimento", "Nacionalidade")
         self.tree = ttk.Treeview(left, columns=columns, show="headings")
 
         for col in columns:
             self.tree.heading(col, text=col)
+            self.tree.column(col, anchor="center")
 
-        self.tree.pack(fill="both", expand=True, padx=10, pady=10)
+        self.tree.pack(fill="both", expand=True, padx=15, pady=10)
 
         # Botões
         btns = ctk.CTkFrame(left, fg_color="transparent")
@@ -53,31 +88,36 @@ class AppAutores:
 
         # ===== RIGHT (FORM) =====
         right = card(container)
-        right.pack(side="right", fill="y", padx=(10, 0))
+        right.pack(side="right", fill="y", padx=(15, 0))
 
-        ctk.CTkLabel(right, text="Cadastro de Autor", font=FONT_TITLE).pack(pady=15)
+        ctk.CTkLabel(
+            right,
+            text="Cadastro de Autor",
+            font=FONT_TITLE,
+            text_color=COLORS["text"]
+        ).pack(pady=20)
 
         form = ctk.CTkFrame(right, fg_color="transparent")
-        form.pack(padx=20, pady=10)
+        form.pack(padx=25, pady=10)
 
         # Nome
         ctk.CTkLabel(form, text="Nome", font=FONT_LABEL).pack(anchor="w")
-        ctk.CTkEntry(form, textvariable=self.nome_var, width=300).pack(pady=5)
+        input_field(form, self.nome_var, placeholder="Digite o nome...").pack(pady=5)
 
         # Data
         ctk.CTkLabel(form, text="Nascimento", font=FONT_LABEL).pack(anchor="w", pady=(10, 0))
-        ctk.CTkEntry(form, textvariable=self.data_var).pack(pady=5)
+        input_field(form, self.data_var, placeholder="DD/MM/AAAA").pack(pady=5)
 
         # Nacionalidade
         ctk.CTkLabel(form, text="Nacionalidade", font=FONT_LABEL).pack(anchor="w", pady=(10, 0))
-        ctk.CTkEntry(form, textvariable=self.nac_var).pack(pady=5)
+        input_field(form, self.nac_var, placeholder="Ex: Brasileiro").pack(pady=5)
 
         # Botões
         actions = ctk.CTkFrame(right, fg_color="transparent")
-        actions.pack(pady=20)
+        actions.pack(pady=25)
 
         success_button(actions, "Salvar", self.salvar).pack(side="left", padx=5)
-        primary_button(actions, "Limpar", self.limpar).pack(side="left", padx=5)
+        secondary_button(actions, "Limpar", self.limpar).pack(side="left", padx=5)
 
     # ===== CRUD =====
 
@@ -99,7 +139,6 @@ class AppAutores:
             self.tree.insert("", "end", values=row)
 
     def parse_date(self, date_text):
-        # Aceita datas em DD/MM/AAAA ou AAAA-MM-DD.
         if not date_text:
             return None
 
@@ -113,7 +152,7 @@ class AppAutores:
             except ValueError:
                 continue
 
-        raise ValueError("Data de nascimento deve estar no formato DD/MM/AAAA ou AAAA-MM-DD")
+        raise ValueError("Data deve estar no formato DD/MM/AAAA ou AAAA-MM-DD")
 
     def salvar(self):
         nome = self.nome_var.get().strip()
@@ -149,6 +188,7 @@ class AppAutores:
             """, dados)
 
         self.conn.commit()
+        messagebox.showinfo("Sucesso", "Autor salvo com sucesso!")
         self.carregar()
         self.limpar()
 
@@ -189,3 +229,4 @@ if __name__ == "__main__":
     root = ctk.CTk()
     app = AppAutores(root)
     root.mainloop()
+    
